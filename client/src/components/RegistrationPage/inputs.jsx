@@ -8,7 +8,7 @@ export const Inputs = () =>{
             <InputLeftElement pointerEvents='none'>
                 <EmailIcon color='gray.300' />
             </InputLeftElement>
-            <Input type='email' placeholder='Your email' />
+            <Input type='email' placeholder='Enter your email' />
         </InputGroup>
     )
 };
