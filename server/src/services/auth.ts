@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { hash, genSalt, compare } from "bcrypt";
 import { sign } from 'jsonwebtoken';
 import { env } from "process";
-import { AuthorizationRequest } from "../middleware/jwt";
 const jwt_secret = env.JWT_SECRET;
 
 export const createUser = async (req: Request, res: Response) => {
@@ -34,8 +33,8 @@ export const createUser = async (req: Request, res: Response) => {
 };
 
 export const getUserData = async (req: Request, res: Response) => {
-    const id = req.user_id;
     
+    const id = req.user_id;
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -83,7 +82,7 @@ export const loginUser = async (req: Request, res: Response) => {
 }
 
 export const deleteUser = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.user_id;
     try {
         const existingUser = await prisma.user.findUnique({
             where: {

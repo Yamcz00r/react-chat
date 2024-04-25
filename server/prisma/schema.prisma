@@ -19,4 +19,12 @@ model User {
   email    String @unique
   name     String @unique
   password String
+  messages Message[]
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [user_id])
+  userId Int
+  content String
 }
