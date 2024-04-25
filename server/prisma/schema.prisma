@@ -27,4 +27,5 @@ model Message {
   user User @relation(fields: [userId], references: [user_id])
   userId Int
   content String
+  timestamp DateTime @updatedAt
 }
