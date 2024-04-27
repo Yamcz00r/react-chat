@@ -8,7 +8,7 @@ export const Links = ({ titles }) => {
         return (
           <WrapItem key={index}>
             <Box fontSize="18px" marginRight="1rem">
-              {title === "You have an account? Login up here" ? (
+              {title === "You already have an account? Login up here" ? (
                 <Link to="/">
                   <ChakraLink color="gray.500">{title}</ChakraLink>
                 </Link>
