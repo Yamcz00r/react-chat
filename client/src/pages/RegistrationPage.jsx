@@ -17,7 +17,7 @@ const Registration = () =>{
 
     return(
         <Box display='flex' justifyContent='center' alignItems='center' height='100vh' flexDirection='column' marginTop='2rem' >
-            <Heading fontSize='4rem' textAlign='center'>Sign Up</Heading> 
+            <Heading fontSize='4rem' textAlign='center'>Sign In</Heading> 
             <form onSubmit={handleSubmit} >
                 <Box display='flex' justifyContent='center' alignItems='center' flexDirection='column' gap={10} marginTop='1.5rem'>
                     <Inputs value={email} onChange={(e) => setEmail(e.target.value)}/>
