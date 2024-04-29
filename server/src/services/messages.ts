@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { prisma } from "../../prisma/prisma";
+import {Request, Response} from 'express';
+import {prisma} from "../../prisma/prisma";
 
 export const sendMessage = async (req: Request, res: Response) => {
     const senderId = req.user_id;
@@ -7,8 +7,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     const { content } = req.body;
     
     if (!content) {
-        const error = new Error("You need to send the message");
-        throw error;
+        throw new Error("You need to send the message");
     }
     try {
         const result = await prisma.message.create({
@@ -30,8 +29,7 @@ export const editMessage = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { content } = req.body;
     if (!content) {
-        const error = new Error("Content was not provided");
-        throw error;
+        throw new Error("Content was not provided");
     }
     try {
         const message = await prisma.message.findUnique({
@@ -40,12 +38,10 @@ export const editMessage = async (req: Request, res: Response) => {
             }
         });
         if (!message) {
-            const error = new Error("You need to send the message");
-            throw error;
+            throw new Error("You need to send the message");
         };
         if (message.userId !== user_id) {
-            const error = new Error("You dont have permission");
-            throw error;
+            throw new Error("You dont have permission");
         };
         const updatedMessage = await prisma.message.update({
             where: {
@@ -71,12 +67,10 @@ export const deleteMessage = async (req: Request, res: Response) => {
             }
         });
         if (!message) {
-            const error = new Error('No message was found!');
-            throw error;
+            throw new Error('No message was found!');
         }
         if (message.userId !== user_id) {
-            const error = new Error("You dont have permission");
-            throw error;
+            throw new Error("You dont have permission");
         };
         const result = await prisma.message.delete({
             where: {
