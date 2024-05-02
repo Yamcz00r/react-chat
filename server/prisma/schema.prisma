@@ -10,32 +10,30 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  user_id   Int        @id @default(autoincrement())
-  email     String     @unique
-  name      String     @unique
-  password  String
-  messages  Message[]
-  chatRooms ChatRoom[]
+  user_id  Int       @id @default(autoincrement())
+  email    String    @unique
+  name     String    @unique
+  password String
+  Message  Message[]
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [user_id])
-  userId     Int
-  content    String
-  timestamp  DateTime @updatedAt
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [roomId])
-  chatRoomId Int
+  message_id     Int          @id @default(autoincrement())
+  text           String
+  conversationId Int
+  conversation   Conversation @relation(fields: [conversationId], references: [conversation_id])
+  senderId       Int
+  sender         User         @relation(fields: [senderId], references: [user_id])
 }
 
-model ChatRoom {
-  roomId    Int       @id @default(autoincrement())
-  room_name String
-  users     User[]
-  messages  Message[]
+model Conversation {
+  conversation_id   Int       @id @default(autoincrement())
+  conversation_name String
+  members           String[]
+  Message           Message[]
 }
