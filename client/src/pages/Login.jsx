@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Box, Heading, Input, useToast } from "@chakra-ui/react";
 import { Links, LocalButton, PasswordInput } from "../components/Login/index";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
+import { useNavigate } from "react-router-dom";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   const toast = useToast();
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
@@ -16,6 +19,42 @@ const Login = () => {
         description: "Each input in form must be filled up!",
       });
       return;
+    }
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      if (!response.ok) {
+        toast({
+          status: "error",
+          isClosable: true,
+          title: "Error",
+          description: "Something went wrong",
+        });
+      }
+      const { token } = await response.json();
+      localStorage.set("token", token);
+      toast({
+        status: "success",
+        isClosable: true,
+        title: "Success",
+        description: "You have successfully logged in to your account",
+      });
+      navigate("/home");
+    } catch (error) {
+      toast({
+        status: "error",
+        isClosable: true,
+        title: "Error",
+        description: "Something went wrong",
+      });
     }
   };
 
