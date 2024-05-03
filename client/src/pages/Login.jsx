@@ -32,29 +32,26 @@ const Login = () => {
         }),
       });
       if (!response.ok) {
+        const errorMessage = await response.json();
         toast({
           status: "error",
           isClosable: true,
           title: "Error",
-          description: "Something went wrong",
+          description: errorMessage.message,
         });
       }
       const { token } = await response.json();
-      localStorage.set("token", token);
+      localStorage.setItem("token", token);
       toast({
         status: "success",
         isClosable: true,
         title: "Success",
         description: "You have successfully logged in to your account",
+        position: "bottom-right",
       });
       navigate("/home");
     } catch (error) {
-      toast({
-        status: "error",
-        isClosable: true,
-        title: "Error",
-        description: "Something went wrong",
-      });
+      console.error(error);
     }
   };
 

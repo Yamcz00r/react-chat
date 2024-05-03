@@ -39,16 +39,18 @@ const Registration = () => {
         body: JSON.stringify({ email, username, password }),
       });
       if (!response.ok) {
+        const errorMessage = await response.json();
         toast({
           status: "error",
           isClosable: true,
           title: "Error",
-          description: "Something went wrong",
+          description: errorMessage.message,
           position: "bottom-right",
         });
+        return;
       }
       const { token } = await response.json();
-      localStorage.set("token", token);
+      localStorage.setItem("token", token);
       toast({
         status: "success",
         isClosable: true,
@@ -58,13 +60,7 @@ const Registration = () => {
       });
       navigate("/home");
     } catch (error) {
-      toast({
-        status: "error",
-        isClosable: true,
-        title: "Error",
-        description: "Something went wrong",
-        position: "bottom-right",
-      });
+      console.error(error);
     }
   };
 
