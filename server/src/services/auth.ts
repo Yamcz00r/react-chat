@@ -1,4 +1,5 @@
 import { prisma } from "../../prisma/prisma";
+import { Prisma } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { hash, genSalt, compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
@@ -10,11 +11,12 @@ export const createUser = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const data = req.body;
+  const { email, password, username } = req.body;
+  console.log(req.body);
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: data.email,
+        email: email,
       },
     });
     if (existingUser) {
@@ -23,15 +25,47 @@ export const createUser = async (
       throw error;
     }
     const salt = await genSalt(10);
-    const hashedPassword = await hash(data.password, salt);
+    const hashedPassword = await hash(password, salt);
     const result = await prisma.user.create({
       data: {
-        email: data.email,
-        name: data.username,
+        email: email,
+        name: username,
         password: hashedPassword,
       },
     });
-    return res.status(200).json(result);
+    const token = sign({ user_id: result.user_id }, jwt_secret!);
+    return res.status(200).json({ token: token, userData: result });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        error.message = "A user with this username already exists";
+      }
+    }
+    next(error);
+  }
+};
+
+export const getUserByUsername = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { name } = req.query;
+  try {
+    const users = await prisma.user.findMany({
+      where: {
+        name: {
+          contains: name as string,
+          mode: "insensitive",
+        },
+      },
+    });
+    if (!users) {
+      const error: any = new Error("Sorry we couldn't find any user");
+      error.status = 404;
+      throw error;
+    }
+    return res.status(200).json(users);
   } catch (error) {
     next(error);
   }
@@ -65,11 +99,11 @@ export const loginUser = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userData = req.body;
+  const { email, password } = req.body;
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: userData.email,
+        email: email,
       },
     });
     if (!existingUser) {
@@ -80,7 +114,7 @@ export const loginUser = async (
       throw error;
     }
     const hashedPassword = existingUser.password;
-    const isPasswordCorrect = await compare(userData.password, hashedPassword);
+    const isPasswordCorrect = await compare(password, hashedPassword);
     if (!isPasswordCorrect) {
       const error: any = new Error("Bad password. Try again");
       error.status = 404;
@@ -90,7 +124,8 @@ export const loginUser = async (
     const token = sign({ user_id: existingUser.user_id }, jwt_secret!);
 
     return res.status(200).json({
-      token,
+      token: token,
+      userData: existingUser,
     });
   } catch (error) {
     next(error);

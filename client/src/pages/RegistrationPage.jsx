@@ -49,7 +49,7 @@ const Registration = () => {
         });
         return;
       }
-      const { token } = await response.json();
+      const { token, userData } = await response.json();
       localStorage.setItem("token", token);
       toast({
         status: "success",

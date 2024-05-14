@@ -1,13 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-export function ProtectedRoute({ children }) {
+export function ProtectedRoute({ children, path }) {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   useEffect(() => {
-    console.log("HERE");
     const token = localStorage.getItem("token");
-    console.log(token);
     if (!token) {
       setIsAuthenticated(false);
       return;
@@ -16,11 +14,12 @@ export function ProtectedRoute({ children }) {
   }, []);
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace={true} />;
+    return <Navigate to={path} replace={true} />;
   }
   return children;
 }
 
 ProtectedRoute.propTypes = {
   children: PropTypes.element,
+  path: PropTypes.string,
 };

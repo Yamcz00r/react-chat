@@ -1,13 +1,15 @@
 import PropTypes from "prop-types";
 import { Box, Text, Button, useDisclosure } from "@chakra-ui/react";
 import ChatItem from "./ChatItem.jsx";
+import { useNavigate } from "react-router-dom";
 import { socket } from "../../socket";
 import ChatCreationModal from "./ChatCreationModal";
-export default function ChatBar({ chats }) {
+export default function ChatBar({ chats, currentChat, revalidate }) {
+  const navigate = useNavigate();
   const handleJoinChat = (chat) => {
-    socket.emit("join_room", chat);
+    socket.emit("joinRoom", chat);
+    navigate(`chat/${chat.conversation_id}`);
   };
-
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -17,6 +19,7 @@ export default function ChatBar({ chats }) {
       padding={2}
       borderRight="1px solid"
       borderRightColor="rgba(0, 0, 0, 0.1)"
+      position="relative"
     >
       <Box marginY={6}>
         <Text fontWeight="bold" fontSize="x-large">
@@ -30,6 +33,7 @@ export default function ChatBar({ chats }) {
               key={chat.conversation_id}
               chat={chat}
               onJoin={handleJoinChat}
+              currentChat={currentChat}
             />
           );
         })
@@ -43,11 +47,32 @@ export default function ChatBar({ chats }) {
           </Button>
         </Box>
       )}
-      {isOpen && <ChatCreationModal onClose={onClose} isOpen={isOpen} />}
+      {isOpen && (
+        <ChatCreationModal
+          onClose={onClose}
+          isOpen={isOpen}
+          revalidate={revalidate}
+        />
+      )}
+      <Box
+        padding={3}
+        width="full"
+        position="absolute"
+        bottom="0"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Button colorScheme="green" onClick={onOpen}>
+          Create new chat
+        </Button>
+      </Box>
     </Box>
   );
 }
 
 ChatBar.propTypes = {
   chats: PropTypes.array,
+  currentChat: PropTypes.string,
+  revalidate: PropTypes.func,
 };

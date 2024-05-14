@@ -16,12 +16,33 @@ export const getConversationForUser = async (
       },
     });
 
-    if (!rooms) {
-      const error: any = new Error("There are no rooms for you!");
+    return res.status(200).json(rooms);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getConversation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { chatId } = req.params;
+  try {
+    const chat = await prisma.conversation.findUnique({
+      where: {
+        conversation_id: +chatId,
+      },
+      include: {
+        Message: true,
+      },
+    });
+    if (!chat) {
+      const error: any = new Error("Conversation not found!");
       error.status = 404;
       throw error;
     }
-    return res.status(200).json(rooms);
+    return res.status(200).json(chat);
   } catch (error) {
     next(error);
   }
