@@ -1,5 +1,6 @@
 import { Wrap, WrapItem, Box, Link as ChakraLink } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export const Links = ({ titles }) => {
   return (
@@ -12,14 +13,12 @@ export const Links = ({ titles }) => {
                 <Link to="/">
                   <ChakraLink color="gray.500">{title}</ChakraLink>
                 </Link>
-              ) : (
-                title === "You don't have an account? Sign up here" ? (
-                  <Link to="/registration">
-                    <ChakraLink color="gray.500">{title}</ChakraLink>
-                  </Link>
-                ) : (
+              ) : title === "You don't have an account? Sign up here" ? (
+                <Link to="/register">
                   <ChakraLink color="gray.500">{title}</ChakraLink>
-                )
+                </Link>
+              ) : (
+                <ChakraLink color="gray.500">{title}</ChakraLink>
               )}
             </Box>
           </WrapItem>
@@ -27,4 +26,8 @@ export const Links = ({ titles }) => {
       })}
     </Wrap>
   );
+};
+
+Links.propTypes = {
+  titles: PropTypes.array,
 };

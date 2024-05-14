@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Inputs } from "../components/RegistrationPage/inputs";
-import { Box, Heading, Input, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  useToast,
+} from "@chakra-ui/react";
 import { Links, PasswordInput } from "../components/Login/index";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 import { useNavigate } from "react-router-dom";
-import { RegisterButton } from "../components/RegistrationPage/registerButton";
-
+import { EmailIcon } from "@chakra-ui/icons";
 const Registration = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -15,47 +21,46 @@ const Registration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!username || !password || !email) {
+    if (!username.length || !password.length || !email.length) {
       toast({
         status: "warning",
         isClosable: true,
         title: "Check form values",
         description: "Each input in form must be filled up!",
+        position: "bottom-right",
       });
       return;
     }
+
     try {
       const response = await fetch("http://localhost:8080/auth/create", {
         method: "POST",
-        body: JSON.stringify({
-          email: email,
-          username: username,
-          password: password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password }),
       });
       if (!response.ok) {
+        const errorMessage = await response.json();
         toast({
           status: "error",
           isClosable: true,
           title: "Error",
-          description: "Something went wrong",
+          description: errorMessage.message,
+          position: "bottom-right",
         });
+        return;
       }
-      const token = await response.json();
-      localStorage.set("token", token);
+      const { token, userData } = await response.json();
+      localStorage.setItem("token", token);
       toast({
         status: "success",
         isClosable: true,
         title: "Success",
         description: "You have successfully created your account",
+        position: "bottom-right",
       });
+      navigate("/home");
     } catch (error) {
-      toast({
-        status: "error",
-        isClosable: true,
-        title: "Error",
-        description: "Something went wrong",
-      });
+      console.error(error);
     }
   };
 
@@ -80,7 +85,17 @@ const Registration = () => {
           gap={10}
           marginTop="1.5rem"
         >
-          <Inputs value={email} onChange={(e) => setEmail(e.target.value)} />
+          <InputGroup size="md">
+            <InputLeftElement pointerEvents="none">
+              <EmailIcon color="gray.300" />
+            </InputLeftElement>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+            />
+          </InputGroup>
           <Input
             width="35rem"
             placeholder={`Enter your username`}
@@ -93,7 +108,11 @@ const Registration = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Box>
-        <RegisterButton />
+        <Box textAlign="center" marginTop="1.5rem">
+          <Button type="submit" colorScheme="blue" size="md">
+            Continue
+          </Button>
+        </Box>
       </form>
       <Links
         titles={[

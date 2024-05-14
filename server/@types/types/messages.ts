@@ -1,5 +1,10 @@
-export interface Message {
-    room_id: number,
-    user_id: number,
-    message: string
+interface User {
+  temp_id: string;
+  db_id: number;
+  rooms: string[];
+}
+
+export interface UsersState {
+  users: User[];
+  setUsers: (users: User) => void;
 }
